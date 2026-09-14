@@ -2,8 +2,8 @@ export class InputController {
   constructor({ upButton, downButton, leftButton, rightButton }) {
     this.keys = new Set();
     this.pressedDirections = new Set();
+    this.pointerDirections = new Map();
     this.active = false;
-    this.activePointerId = null;
     this.buttons = {
       up: upButton,
       down: downButton,
@@ -63,13 +63,13 @@ export class InputController {
         }
 
         event.preventDefault();
-        this.activePointerId = event.pointerId;
-        this.setPressedDirection(direction);
+        this.pointerDirections.set(event.pointerId, direction);
+        this.syncPressedDirections();
         button.setPointerCapture?.(event.pointerId);
       };
 
       const move = (event) => {
-        if (event.pointerId !== this.activePointerId) {
+        if (!this.pointerDirections.has(event.pointerId)) {
           return;
         }
 
@@ -78,19 +78,24 @@ export class InputController {
         const hoveredDirection = this.buttonDirections.get(hoveredButton);
 
         if (hoveredDirection) {
-          this.setPressedDirection(hoveredDirection);
+          this.pointerDirections.set(event.pointerId, hoveredDirection);
         } else {
-          this.clearPressedDirections();
+          this.pointerDirections.set(event.pointerId, null);
         }
+
+        this.syncPressedDirections();
       };
 
       const deactivate = (event) => {
-        if (event?.pointerId !== undefined && event.pointerId !== this.activePointerId) {
+        if (event?.pointerId !== undefined && !this.pointerDirections.has(event.pointerId)) {
           return;
         }
 
         event?.preventDefault?.();
-        this.releasePointer();
+        if (event?.pointerId !== undefined) {
+          this.pointerDirections.delete(event.pointerId);
+        }
+        this.syncPressedDirections();
       };
 
       button.addEventListener("pointerdown", activate);
@@ -101,15 +106,12 @@ export class InputController {
     });
   }
 
-  setPressedDirection(direction) {
-    this.pressedDirections.clear();
-
-    if (direction) {
-      this.pressedDirections.add(direction);
-    }
-
+  syncPressedDirections() {
+    this.pressedDirections = new Set(
+      [...this.pointerDirections.values()].filter((direction) => Boolean(direction))
+    );
     Object.entries(this.buttons).forEach(([buttonDirection, button]) => {
-      button?.classList.toggle("pressed", buttonDirection === direction);
+      button?.classList.toggle("pressed", this.pressedDirections.has(buttonDirection));
     });
   }
 
@@ -119,7 +121,7 @@ export class InputController {
   }
 
   releasePointer() {
-    this.activePointerId = null;
+    this.pointerDirections.clear();
     this.clearPressedDirections();
   }
 

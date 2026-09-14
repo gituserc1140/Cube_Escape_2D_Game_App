@@ -31,6 +31,13 @@ const gameState = {
   dpr: 1,
 };
 
+function getViewportSize() {
+  return {
+    width: sceneContainer.clientWidth || window.innerWidth,
+    height: sceneContainer.clientHeight || window.innerHeight,
+  };
+}
+
 function updateStatusHUD() {
   ui.updateHUD({
     timeRemaining: gameState.timer,
@@ -53,6 +60,7 @@ function createWorld() {
 function startGame() {
   createWorld();
   gameState.playing = true;
+  gameState.lastFrameTime = performance.now();
   gameState.timer = gameState.world.timeLimit;
   gameState.keysCollected = 0;
   gameState.exitUnlocked = false;
@@ -138,11 +146,12 @@ function checkInteractions() {
 }
 
 function resizeCanvas() {
+  const { width, height } = getViewportSize();
   gameState.dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-  canvas.width = Math.floor(window.innerWidth * gameState.dpr);
-  canvas.height = Math.floor(window.innerHeight * gameState.dpr);
-  canvas.style.width = `${window.innerWidth}px`;
-  canvas.style.height = `${window.innerHeight}px`;
+  canvas.width = Math.floor(width * gameState.dpr);
+  canvas.height = Math.floor(height * gameState.dpr);
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
 }
 
 function getBoardMetrics() {
@@ -150,17 +159,18 @@ function getBoardMetrics() {
     return null;
   }
 
-  const padding = Math.min(window.innerWidth, window.innerHeight) < 640 ? 18 : 28;
-  const availableWidth = window.innerWidth - padding * 2;
-  const availableHeight = window.innerHeight - padding * 2;
+  const { width, height } = getViewportSize();
+  const padding = Math.min(width, height) < 640 ? 18 : 28;
+  const availableWidth = width - padding * 2;
+  const availableHeight = height - padding * 2;
   const cellSize = Math.max(18, Math.floor(Math.min(availableWidth / gameState.world.size, availableHeight / gameState.world.size)));
   const boardSize = cellSize * gameState.world.size;
 
   return {
     cellSize,
     boardSize,
-    left: (window.innerWidth - boardSize) / 2,
-    top: (window.innerHeight - boardSize) / 2,
+    left: (width - boardSize) / 2,
+    top: (height - boardSize) / 2,
     wallThickness: Math.max(2, Math.floor(cellSize * 0.12)),
   };
 }
@@ -177,25 +187,26 @@ function drawRoundedRect(x, y, width, height, radius) {
 }
 
 function drawBackground() {
+  const { width, height } = getViewportSize();
   const gradient = ctx.createRadialGradient(
-    window.innerWidth * 0.5,
-    window.innerHeight * 0.2,
+    width * 0.5,
+    height * 0.2,
     40,
-    window.innerWidth * 0.5,
-    window.innerHeight * 0.5,
-    window.innerWidth * 0.8
+    width * 0.5,
+    height * 0.5,
+    width * 0.8
   );
   gradient.addColorStop(0, "#0b214e");
   gradient.addColorStop(1, "#020a1d");
   ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  ctx.fillRect(0, 0, width, height);
 
   for (let index = 0; index < 18; index += 1) {
-    const x = ((index * 173) % window.innerWidth) + ((gameState.elapsed * 16) % 40);
-    const y = (index * 97) % window.innerHeight;
+    const x = ((index * 173) % width) + ((gameState.elapsed * 16) % 40);
+    const y = (index * 97) % height;
     const alpha = 0.08 + (index % 4) * 0.02;
     ctx.fillStyle = `rgba(103, 232, 249, ${alpha})`;
-    ctx.fillRect(x % window.innerWidth, y, 2, 2);
+    ctx.fillRect(x % width, y, 2, 2);
   }
 }
 
