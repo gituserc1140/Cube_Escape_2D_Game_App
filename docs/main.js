@@ -89,6 +89,7 @@ function createWorld() {
 function startGame() {
   createWorld();
   gameState.playing = true;
+  input.setActive(true);
   gameState.timer = gameState.world.timeLimit;
   gameState.keysCollected = 0;
   gameState.exitUnlocked = false;
@@ -102,7 +103,7 @@ function startGame() {
 
 function returnToMenu() {
   gameState.playing = false;
-  input.resetTouchInput();
+  input.setActive(false);
   ui.showTitle();
 }
 
@@ -116,7 +117,7 @@ function hideInstructions() {
 
 function endGame(victory) {
   gameState.playing = false;
-  input.resetTouchInput();
+  input.setActive(false);
   ui.clearPersistentStatus();
   ui.showEndScreen(victory);
 }

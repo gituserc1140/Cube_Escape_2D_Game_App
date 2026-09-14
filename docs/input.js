@@ -20,6 +20,7 @@ export class InputController {
     this.joystickStart = null;
     this.joystickRadius = 42;
     this.keyboardLookSpeed = 4;
+    this.active = false;
 
     this.bindKeyboard();
     this.bindMouseLook();
@@ -28,13 +29,21 @@ export class InputController {
 
   bindKeyboard() {
     window.addEventListener("keydown", (event) => {
-      if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(event.code)) {
+      if (!this.active) {
+        return;
+      }
+
+      if (["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) {
         event.preventDefault();
       }
       this.keys.add(event.code);
     });
 
     window.addEventListener("keyup", (event) => {
+      if (!this.active) {
+        return;
+      }
+
       this.keys.delete(event.code);
     });
 
@@ -170,6 +179,16 @@ export class InputController {
     this.lastLookPoint = null;
     this.joystickStart = null;
     this.joystickKnob.style.transform = "translate(-50%, -50%)";
+  }
+
+  setActive(active) {
+    this.active = active;
+
+    if (!active) {
+      this.keys.clear();
+      this.resetTouchInput();
+      this.lookDelta = { x: 0, y: 0 };
+    }
   }
 
   consumeFrameState() {
