@@ -71,7 +71,6 @@ export class InputController {
       button.addEventListener("pointerdown", activate);
       button.addEventListener("pointerup", deactivate);
       button.addEventListener("pointercancel", deactivate);
-      button.addEventListener("pointerleave", deactivate);
       button.addEventListener("lostpointercapture", deactivate);
     });
   }

@@ -253,6 +253,7 @@ h3 {
   background: rgba(3, 15, 40, 0.38);
   position: relative;
   pointer-events: auto;
+  touch-action: none;
 }
 
 .control-surface .control-label {
