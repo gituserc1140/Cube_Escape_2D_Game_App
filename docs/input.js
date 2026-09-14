@@ -55,7 +55,7 @@ export class InputController {
 
   bindMouseLook() {
     this.canvas.addEventListener("pointerdown", (event) => {
-      if (event.pointerType === "touch") {
+      if (!this.active || event.pointerType === "touch") {
         return;
       }
 
@@ -87,7 +87,7 @@ export class InputController {
 
   bindTouchControls() {
     this.joystickZone.addEventListener("pointerdown", (event) => {
-      if (event.pointerType !== "touch") {
+      if (!this.active || event.pointerType !== "touch") {
         return;
       }
 
@@ -120,7 +120,7 @@ export class InputController {
     this.joystickZone.addEventListener("pointercancel", stopJoystick);
 
     this.lookPad.addEventListener("pointerdown", (event) => {
-      if (event.pointerType !== "touch") {
+      if (!this.active || event.pointerType !== "touch") {
         return;
       }
 
