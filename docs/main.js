@@ -60,6 +60,7 @@ function startGame() {
   gameState.hintCooldown = 0;
   input.setActive(true);
   ui.clearPersistentStatus();
+  checkInteractions();
   updateStatusHUD();
   ui.showGame();
 }
@@ -136,7 +137,7 @@ function checkInteractions() {
 }
 
 function resizeCanvas() {
-  gameState.dpr = Math.min(window.devicePixelRatio || 1, 2);
+  gameState.dpr = Math.min(window.devicePixelRatio || 1, 1.5);
   canvas.width = Math.floor(window.innerWidth * gameState.dpr);
   canvas.height = Math.floor(window.innerHeight * gameState.dpr);
   canvas.style.width = `${window.innerWidth}px`;

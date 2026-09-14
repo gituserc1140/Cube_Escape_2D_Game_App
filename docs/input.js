@@ -59,7 +59,6 @@ export class InputController {
         event.preventDefault();
         this.pressedDirections.add(direction);
         button.classList.add("pressed");
-        button.setPointerCapture?.(event.pointerId);
       };
 
       const deactivate = (event) => {
@@ -70,8 +69,9 @@ export class InputController {
 
       button.addEventListener("pointerdown", activate);
       button.addEventListener("pointerup", deactivate);
+      button.addEventListener("pointerleave", deactivate);
+      button.addEventListener("pointerout", deactivate);
       button.addEventListener("pointercancel", deactivate);
-      button.addEventListener("lostpointercapture", deactivate);
     });
   }
 
