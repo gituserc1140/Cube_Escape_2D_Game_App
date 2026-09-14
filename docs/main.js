@@ -17,6 +17,11 @@ const input = new InputController({
   leftButton: document.getElementById("moveLeftButton"),
   rightButton: document.getElementById("moveRightButton"),
 });
+const layoutElements = {
+  hud: document.getElementById("hud"),
+  statusBanner: document.getElementById("statusBanner"),
+  touchControls: document.getElementById("touchControls"),
+};
 const player = new Player();
 
 const gameState = {
@@ -33,10 +38,36 @@ const gameState = {
 };
 
 function getViewportSize() {
+  const viewport = window.visualViewport;
   return {
-    width: sceneContainer.clientWidth || window.innerWidth,
-    height: sceneContainer.clientHeight || window.innerHeight,
+    width: Math.floor(viewport?.width || sceneContainer.clientWidth || window.innerWidth),
+    height: Math.floor(viewport?.height || sceneContainer.clientHeight || window.innerHeight),
   };
+}
+
+function isVisible(element) {
+  return Boolean(element) && !element.classList.contains("hidden") && window.getComputedStyle(element).display !== "none";
+}
+
+function getViewportInsets() {
+  const { width, height } = getViewportSize();
+  const spacing = width < 640 ? 12 : 18;
+  let top = 0;
+  let bottom = 0;
+
+  [layoutElements.hud, layoutElements.statusBanner].forEach((element) => {
+    if (!isVisible(element)) {
+      return;
+    }
+
+    top = Math.max(top, element.getBoundingClientRect().bottom + spacing);
+  });
+
+  if (isVisible(layoutElements.touchControls)) {
+    bottom = Math.max(bottom, height - layoutElements.touchControls.getBoundingClientRect().top + spacing);
+  }
+
+  return { top, bottom };
 }
 
 function updateStatusHUD() {
@@ -138,17 +169,19 @@ function getBoardMetrics() {
   }
 
   const { width, height } = getViewportSize();
+  const { top: topInset, bottom: bottomInset } = getViewportInsets();
   const padding = Math.min(width, height) < 640 ? 18 : 28;
-  const availableWidth = width - padding * 2;
-  const availableHeight = height - padding * 2;
-  const cellSize = Math.max(18, Math.floor(Math.min(availableWidth / gameState.world.size, availableHeight / gameState.world.size)));
+  const boardFrame = 20;
+  const availableWidth = Math.max(width - padding * 2 - boardFrame, 1);
+  const availableHeight = Math.max(height - topInset - bottomInset - padding * 2 - boardFrame, 1);
+  const cellSize = Math.max(8, Math.floor(Math.min(availableWidth / gameState.world.size, availableHeight / gameState.world.size)));
   const boardSize = cellSize * gameState.world.size;
 
   return {
     cellSize,
     boardSize,
     left: (width - boardSize) / 2,
-    top: (height - boardSize) / 2,
+    top: topInset + (height - topInset - bottomInset - boardSize) / 2,
     wallThickness: Math.max(2, Math.floor(cellSize * 0.12)),
   };
 }
@@ -364,4 +397,5 @@ resizeCanvas();
 setDifficulty("easy");
 returnToMenu();
 window.addEventListener("resize", resizeCanvas);
+window.visualViewport?.addEventListener("resize", resizeCanvas);
 window.requestAnimationFrame(gameLoop);
