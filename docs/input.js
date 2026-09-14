@@ -3,12 +3,18 @@ export class InputController {
     this.keys = new Set();
     this.pressedDirections = new Set();
     this.active = false;
+    this.activePointerId = null;
     this.buttons = {
       up: upButton,
       down: downButton,
       left: leftButton,
       right: rightButton,
     };
+    this.buttonDirections = new Map(
+      Object.entries(this.buttons)
+        .filter(([, button]) => Boolean(button))
+        .map(([direction, button]) => [button, direction])
+    );
 
     this.bindKeyboard();
     this.bindTouchControls();
@@ -41,7 +47,7 @@ export class InputController {
 
     window.addEventListener("blur", () => {
       this.keys.clear();
-      this.clearPressedDirections();
+      this.releasePointer();
     });
   }
 
@@ -57,21 +63,53 @@ export class InputController {
         }
 
         event.preventDefault();
-        this.pressedDirections.add(direction);
-        button.classList.add("pressed");
+        this.activePointerId = event.pointerId;
+        this.setPressedDirection(direction);
+        button.setPointerCapture?.(event.pointerId);
+      };
+
+      const move = (event) => {
+        if (event.pointerId !== this.activePointerId) {
+          return;
+        }
+
+        event.preventDefault();
+        const hoveredButton = document.elementFromPoint(event.clientX, event.clientY)?.closest?.(".touch-button");
+        const hoveredDirection = this.buttonDirections.get(hoveredButton);
+
+        if (hoveredDirection) {
+          this.setPressedDirection(hoveredDirection);
+        } else {
+          this.clearPressedDirections();
+        }
       };
 
       const deactivate = (event) => {
+        if (event?.pointerId !== undefined && event.pointerId !== this.activePointerId) {
+          return;
+        }
+
         event?.preventDefault?.();
-        this.pressedDirections.delete(direction);
-        button.classList.remove("pressed");
+        this.releasePointer();
       };
 
       button.addEventListener("pointerdown", activate);
+      button.addEventListener("pointermove", move);
       button.addEventListener("pointerup", deactivate);
-      button.addEventListener("pointerleave", deactivate);
-      button.addEventListener("pointerout", deactivate);
       button.addEventListener("pointercancel", deactivate);
+      button.addEventListener("lostpointercapture", deactivate);
+    });
+  }
+
+  setPressedDirection(direction) {
+    this.pressedDirections.clear();
+
+    if (direction) {
+      this.pressedDirections.add(direction);
+    }
+
+    Object.entries(this.buttons).forEach(([buttonDirection, button]) => {
+      button?.classList.toggle("pressed", buttonDirection === direction);
     });
   }
 
@@ -80,12 +118,17 @@ export class InputController {
     Object.values(this.buttons).forEach((button) => button?.classList.remove("pressed"));
   }
 
+  releasePointer() {
+    this.activePointerId = null;
+    this.clearPressedDirections();
+  }
+
   setActive(active) {
     this.active = active;
 
     if (!active) {
       this.keys.clear();
-      this.clearPressedDirections();
+      this.releasePointer();
     }
   }
 

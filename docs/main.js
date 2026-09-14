@@ -67,6 +67,7 @@ function startGame() {
 
 function returnToMenu() {
   gameState.playing = false;
+  gameState.world = null;
   input.setActive(false);
   ui.showTitle();
 }
