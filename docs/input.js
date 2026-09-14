@@ -19,6 +19,7 @@ export class InputController {
     this.lastLookPoint = null;
     this.joystickStart = null;
     this.joystickRadius = 42;
+    this.keyboardLookSpeed = 4;
 
     this.bindKeyboard();
     this.bindMouseLook();
@@ -73,7 +74,6 @@ export class InputController {
 
     this.canvas.addEventListener("pointerup", releasePointer);
     this.canvas.addEventListener("pointercancel", releasePointer);
-    this.canvas.addEventListener("pointerleave", releasePointer);
   }
 
   bindTouchControls() {
@@ -177,13 +177,20 @@ export class InputController {
       x: (this.keys.has("KeyD") ? 1 : 0) - (this.keys.has("KeyA") ? 1 : 0),
       y: (this.keys.has("KeyW") ? 1 : 0) - (this.keys.has("KeyS") ? 1 : 0),
     };
+    const keyboardLook = {
+      x: ((this.keys.has("ArrowRight") ? 1 : 0) - (this.keys.has("ArrowLeft") ? 1 : 0)) * this.keyboardLookSpeed,
+      y: ((this.keys.has("ArrowDown") ? 1 : 0) - (this.keys.has("ArrowUp") ? 1 : 0)) * this.keyboardLookSpeed,
+    };
 
     const move = {
       x: clamp(keyboardMove.x + this.joystickVector.x, -1, 1),
       y: clamp(keyboardMove.y + this.joystickVector.y, -1, 1),
     };
 
-    const look = { ...this.lookDelta };
+    const look = {
+      x: this.lookDelta.x + keyboardLook.x,
+      y: this.lookDelta.y + keyboardLook.y,
+    };
     this.lookDelta = { x: 0, y: 0 };
     return { move, look };
   }

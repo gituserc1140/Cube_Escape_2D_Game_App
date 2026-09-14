@@ -21,6 +21,7 @@ Cube Escape 3D is a mobile-friendly first-person maze game built with HTML, CSS,
 - **A**: strafe left
 - **D**: strafe right
 - **Mouse drag**: look around
+- **Arrow keys**: keyboard camera look
 
 ### Mobile / Tablet
 
@@ -43,7 +44,7 @@ Cube Escape 3D is a mobile-friendly first-person maze game built with HTML, CSS,
    python -m http.server 8000
    ```
 
-4. Visit `http://localhost:8000/docs/` in your browser.
+4. Visit `http://localhost:8000/` in your browser.
 
 ## Project Structure
 
