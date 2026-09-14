@@ -48,7 +48,10 @@ button {
 #sceneContainer {
   position: absolute;
   inset: 0;
-  touch-action: none;
+}
+
+#gameCanvas {
+  display: block;
 }
 
 .panel {
@@ -179,15 +182,17 @@ h3 {
 
 .difficulty-button,
 .primary-button,
-.secondary-button {
+.secondary-button,
+.touch-button {
   border-radius: 999px;
   border: 1px solid rgba(103, 232, 249, 0.28);
   padding: 0.9rem 1.25rem;
-  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
 }
 
 .difficulty-button,
-.secondary-button {
+.secondary-button,
+.touch-button {
   background: rgba(8, 30, 69, 0.82);
 }
 
@@ -206,9 +211,11 @@ h3 {
 .difficulty-button:hover,
 .primary-button:hover,
 .secondary-button:hover,
+.touch-button:hover,
 .difficulty-button:focus-visible,
 .primary-button:focus-visible,
-.secondary-button:focus-visible {
+.secondary-button:focus-visible,
+.touch-button:focus-visible {
   transform: translateY(-1px);
   outline: none;
   border-color: rgba(103, 232, 249, 0.8);
@@ -233,21 +240,19 @@ h3 {
   inset: auto 0 max(1rem, env(safe-area-inset-bottom)) 0;
   z-index: 6;
   display: none;
-  justify-content: space-between;
-  align-items: end;
+  justify-content: center;
   padding: 0 1rem;
   pointer-events: none;
 }
 
 .control-surface {
-  width: min(42vw, 180px);
-  height: min(42vw, 180px);
-  border-radius: 24px;
+  width: min(52vw, 220px);
+  height: min(52vw, 220px);
+  border-radius: 28px;
   border: 1px solid rgba(103, 232, 249, 0.22);
   background: rgba(3, 15, 40, 0.38);
   position: relative;
   pointer-events: auto;
-  touch-action: none;
 }
 
 .control-surface .control-label {
@@ -256,34 +261,52 @@ h3 {
   top: 1rem;
 }
 
-#joystickBase {
+.dpad-grid {
   position: absolute;
-  inset: 50% auto auto 50%;
-  width: 110px;
-  height: 110px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  border: 1px solid rgba(103, 232, 249, 0.25);
-  background: rgba(7, 25, 61, 0.55);
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  align-items: center;
+  justify-items: center;
+  padding: 1rem;
 }
 
-#joystickKnob {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: 52px;
-  height: 52px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #a5f3fc 0%, #22d3ee 42%, #0f4c81 100%);
-  box-shadow: 0 0 18px rgba(34, 211, 238, 0.35);
+.touch-button {
+  width: min(18vw, 74px);
+  height: min(18vw, 74px);
+  padding: 0;
+  border-radius: 22px;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 700;
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.12);
 }
 
-#lookPad::after {
-  content: "";
-  position: absolute;
-  inset: 1rem;
-  border: 1px dashed rgba(103, 232, 249, 0.3);
-  border-radius: 18px;
+.touch-button.up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.touch-button.left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.touch-button.right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.touch-button.down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.touch-button.pressed {
+  transform: scale(0.97);
+  border-color: rgba(253, 224, 71, 0.88);
+  box-shadow: 0 0 22px rgba(253, 224, 71, 0.22);
+  background: rgba(24, 52, 97, 0.94);
 }
 
 .hidden {

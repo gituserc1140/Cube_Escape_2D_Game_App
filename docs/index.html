@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Cube Escape 3D</title>
+    <title>Cube Escape 2D</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <div id="app">
-      <main id="sceneContainer" aria-label="Cube Escape 3D game view"></main>
+      <main id="sceneContainer" aria-label="Cube Escape 2D game board"></main>
 
       <header id="hud" class="panel hidden" aria-live="polite">
         <div class="hud-item">
@@ -31,9 +31,9 @@
       <section id="titleScreen" class="screen">
         <div class="panel menu-card">
           <p class="eyebrow">Minimal Neon Maze</p>
-          <h1>Cube Escape 3D</h1>
+          <h1>Cube Escape 2D</h1>
           <p class="intro">
-            Explore a shifting neon maze, collect three glowing keys, dodge traps, and escape before the timer runs out.
+            Race across a shifting neon maze, collect three glowing keys, dodge traps, and unlock the exit before the clock runs out.
           </p>
 
           <div class="difficulty-block">
@@ -59,26 +59,25 @@
             <div>
               <h3>Desktop</h3>
               <ul>
-                <li>W / S move forward and backward.</li>
-                <li>A / D strafe left and right.</li>
-                <li>Drag on the maze view to look around.</li>
-                <li>Arrow keys also turn the camera.</li>
+                <li>Use W / A / S / D or the arrow keys.</li>
+                <li>Hold a direction to step tile by tile.</li>
+                <li>Reach the exit after unlocking it.</li>
               </ul>
             </div>
             <div>
               <h3>Mobile</h3>
               <ul>
-                <li>Use the joystick to move.</li>
-                <li>Swipe on the look pad to turn.</li>
-                <li>Keep the exit in sight once it opens.</li>
+                <li>Use the on-screen direction pad.</li>
+                <li>Tap or hold to move through corridors.</li>
+                <li>Watch trap tiles before you commit.</li>
               </ul>
             </div>
             <div>
               <h3>Objectives</h3>
               <ul>
-                <li>Collect all three floating keys.</li>
+                <li>Collect all three glowing keys.</li>
                 <li>Avoid red traps or lose 10 seconds.</li>
-                <li>Touch the exit door before time reaches zero.</li>
+                <li>Step on the exit tile before time reaches zero.</li>
               </ul>
             </div>
           </div>
@@ -98,15 +97,15 @@
         </div>
       </section>
 
-      <section id="touchControls" aria-label="Touch controls for movement and camera look">
-        <div id="joystickZone" class="control-surface" aria-hidden="true">
+      <section id="touchControls" aria-label="Touch controls for movement">
+        <div id="dpad" class="control-surface" aria-hidden="true">
           <span class="control-label">Move</span>
-          <div id="joystickBase">
-            <div id="joystickKnob"></div>
+          <div class="dpad-grid">
+            <button id="moveUpButton" class="touch-button up" type="button" aria-label="Move up">↑</button>
+            <button id="moveLeftButton" class="touch-button left" type="button" aria-label="Move left">←</button>
+            <button id="moveRightButton" class="touch-button right" type="button" aria-label="Move right">→</button>
+            <button id="moveDownButton" class="touch-button down" type="button" aria-label="Move down">↓</button>
           </div>
-        </div>
-        <div id="lookPad" class="control-surface" aria-hidden="true">
-          <span class="control-label">Look</span>
         </div>
       </section>
     </div>

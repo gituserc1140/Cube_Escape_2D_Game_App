@@ -1,10 +1,10 @@
-# Cube Escape 3D
+# Cube Escape 2D
 
-Cube Escape 3D is a mobile-friendly first-person maze game built with HTML, CSS, JavaScript, and Three.js. Each run generates a fresh neon maze where you must collect three floating keys, avoid time-draining traps, unlock the exit, and escape before the countdown reaches zero.
+Cube Escape 2D is a mobile-friendly top-down maze game built with HTML, CSS, and JavaScript. Each run generates a fresh neon maze where you must collect three glowing keys, avoid time-draining traps, unlock the exit, and escape before the countdown reaches zero.
 
 ## Game Overview
 
-- First-person maze exploration with desktop and mobile controls
+- Top-down neon maze exploration with desktop and mobile controls
 - Randomly generated maze layouts for every new game
 - Three collectible keys needed to unlock the exit
 - Trap tiles that remove 10 seconds on contact
@@ -16,17 +16,12 @@ Cube Escape 3D is a mobile-friendly first-person maze game built with HTML, CSS,
 
 ### Desktop
 
-- **W**: move forward
-- **S**: move backward
-- **A**: strafe left
-- **D**: strafe right
-- **Mouse drag**: look around
-- **Arrow keys**: keyboard camera look
+- **W / A / S / D**: move tile by tile
+- **Arrow keys**: move tile by tile
 
 ### Mobile / Tablet
 
-- **Virtual joystick**: movement
-- **Look pad swipe**: look around
+- **On-screen direction pad**: move through the maze
 
 ## Difficulty Modes
 
@@ -76,5 +71,4 @@ README.md
 ## Notes
 
 - The root `index.html` redirects to `/docs/` for convenience.
-- Three.js is vendored in `docs/vendor/three.module.js` so the published site does not depend on a third-party CDN at runtime.
 - The game runs entirely client-side with no backend services.

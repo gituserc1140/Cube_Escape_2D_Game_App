@@ -1,77 +1,41 @@
-import * as THREE from "./vendor/three.module.js";
+import { stepPosition } from "./maze.js";
 
-function circleIntersectsBox(x, z, radius, box) {
-  const nearestX = Math.max(box.minX, Math.min(x, box.maxX));
-  const nearestZ = Math.max(box.minZ, Math.min(z, box.maxZ));
-  const distanceX = x - nearestX;
-  const distanceZ = z - nearestZ;
-  return distanceX * distanceX + distanceZ * distanceZ < radius * radius;
-}
-
-// Manage first-person movement, camera rotation, and simple maze collision checks.
 export class Player {
-  constructor(camera) {
-    this.camera = camera;
-    this.position = new THREE.Vector3();
-    this.radius = 0.5;
-    this.eyeHeight = 1.7;
-    this.moveSpeed = 7.8;
-    this.lookSensitivity = 0.0028;
-    this.pitch = 0;
-    this.yaw = 0;
-    this.updateCamera();
+  constructor() {
+    this.position = { x: 0, y: 0 };
+    this.stepInterval = 0.14;
+    this.stepCooldown = 0;
   }
 
   reset(startPosition) {
-    this.position.copy(startPosition);
-    this.position.y = this.eyeHeight;
-    this.pitch = 0;
-    this.yaw = Math.PI;
-    this.updateCamera();
+    this.position = { ...startPosition };
+    this.stepCooldown = 0;
   }
 
-  update(deltaTime, inputState, collisionBoxes) {
-    this.yaw -= inputState.look.x * this.lookSensitivity;
-    this.pitch -= inputState.look.y * this.lookSensitivity;
-    this.pitch = THREE.MathUtils.clamp(this.pitch, -1.2, 1.2);
+  update(deltaTime, inputState, world) {
+    this.stepCooldown = Math.max(0, this.stepCooldown - deltaTime);
+    const directionKey = this.resolveDirection(inputState.move);
 
-    const movement = new THREE.Vector3(inputState.move.x, 0, inputState.move.y);
-
-    if (movement.lengthSq() > 1) {
-      movement.normalize();
+    if (!directionKey || this.stepCooldown > 0) {
+      return false;
     }
 
-    const forward = new THREE.Vector3(Math.sin(this.yaw), 0, -Math.cos(this.yaw));
-    const right = new THREE.Vector3(Math.cos(this.yaw), 0, Math.sin(this.yaw));
-    const velocity = forward.multiplyScalar(movement.z).add(right.multiplyScalar(movement.x));
-
-    if (velocity.lengthSq() > 0) {
-      velocity.normalize().multiplyScalar(this.moveSpeed * deltaTime);
-      this.tryMoveAxis("x", velocity.x, collisionBoxes);
-      this.tryMoveAxis("z", velocity.z, collisionBoxes);
-    }
-
-    this.updateCamera();
+    const nextPosition = stepPosition(world, this.position.x, this.position.y, directionKey);
+    const moved = nextPosition.x !== this.position.x || nextPosition.y !== this.position.y;
+    this.position = nextPosition;
+    this.stepCooldown = this.stepInterval;
+    return moved;
   }
 
-  tryMoveAxis(axis, amount, collisionBoxes) {
-    if (amount === 0) {
-      return;
+  resolveDirection(move) {
+    if (!move.x && !move.y) {
+      return null;
     }
 
-    const nextX = axis === "x" ? this.position.x + amount : this.position.x;
-    const nextZ = axis === "z" ? this.position.z + amount : this.position.z;
-    const blocked = collisionBoxes.some((box) => circleIntersectsBox(nextX, nextZ, this.radius, box));
-
-    if (!blocked) {
-      this.position[axis] += amount;
+    if (Math.abs(move.x) > Math.abs(move.y)) {
+      return move.x > 0 ? "E" : "W";
     }
-  }
 
-  updateCamera() {
-    this.camera.position.copy(this.position);
-    this.camera.rotation.order = "YXZ";
-    this.camera.rotation.y = this.yaw;
-    this.camera.rotation.x = this.pitch;
+    return move.y > 0 ? "S" : "N";
   }
 }
