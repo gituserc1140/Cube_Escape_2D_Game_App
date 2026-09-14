@@ -38,6 +38,7 @@ const gameState = {
   dpr: 1,
 };
 let resizeListenersBound = false;
+let resizeFrame = 0;
 
 function getViewportSize() {
   const viewport = window.visualViewport;
@@ -165,13 +166,24 @@ function resizeCanvas() {
   canvas.style.height = `${height}px`;
 }
 
+function scheduleResizeCanvas() {
+  if (resizeFrame) {
+    return;
+  }
+
+  resizeFrame = window.requestAnimationFrame(() => {
+    resizeFrame = 0;
+    resizeCanvas();
+  });
+}
+
 function bindResizeListeners() {
   if (resizeListenersBound) {
     return;
   }
 
-  window.addEventListener("resize", resizeCanvas);
-  window.visualViewport?.addEventListener("resize", resizeCanvas);
+  window.addEventListener("resize", scheduleResizeCanvas);
+  window.visualViewport?.addEventListener("resize", scheduleResizeCanvas);
   resizeListenersBound = true;
 }
 
