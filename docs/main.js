@@ -17,6 +17,12 @@ const input = new InputController({
   leftButton: document.getElementById("moveLeftButton"),
   rightButton: document.getElementById("moveRightButton"),
 });
+const layoutElements = {
+  hud: document.getElementById("hud"),
+  statusBanner: document.getElementById("statusBanner"),
+  touchControls: document.getElementById("touchControls"),
+};
+const BOARD_FRAME_INSET = 10;
 const player = new Player();
 
 const gameState = {
@@ -31,12 +37,40 @@ const gameState = {
   lastFrameTime: performance.now(),
   dpr: 1,
 };
+let resizeListenersBound = false;
+let resizeFrame = 0;
 
 function getViewportSize() {
+  const viewport = window.visualViewport;
   return {
-    width: sceneContainer.clientWidth || window.innerWidth,
-    height: sceneContainer.clientHeight || window.innerHeight,
+    width: Math.floor(viewport?.width || sceneContainer.clientWidth || window.innerWidth),
+    height: Math.floor(viewport?.height || sceneContainer.clientHeight || window.innerHeight),
   };
+}
+
+function isVisible(element) {
+  return Boolean(element) && !element.classList.contains("hidden") && window.getComputedStyle(element).display !== "none";
+}
+
+function getViewportInsets() {
+  const { width, height } = getViewportSize();
+  const spacing = width < 640 ? 12 : 18;
+  let top = 0;
+  let bottom = 0;
+
+  [layoutElements.hud, layoutElements.statusBanner].forEach((element) => {
+    if (!isVisible(element)) {
+      return;
+    }
+
+    top = Math.max(top, element.getBoundingClientRect().bottom + spacing);
+  });
+
+  if (isVisible(layoutElements.touchControls)) {
+    bottom = Math.max(bottom, height - layoutElements.touchControls.getBoundingClientRect().top + spacing);
+  }
+
+  return { top, bottom };
 }
 
 function updateStatusHUD() {
@@ -132,23 +166,46 @@ function resizeCanvas() {
   canvas.style.height = `${height}px`;
 }
 
+function scheduleResizeCanvas() {
+  if (resizeFrame) {
+    return;
+  }
+
+  resizeFrame = window.requestAnimationFrame(() => {
+    resizeFrame = 0;
+    resizeCanvas();
+  });
+}
+
+function bindResizeListeners() {
+  if (resizeListenersBound) {
+    return;
+  }
+
+  window.addEventListener("resize", scheduleResizeCanvas);
+  window.visualViewport?.addEventListener("resize", scheduleResizeCanvas);
+  resizeListenersBound = true;
+}
+
 function getBoardMetrics() {
   if (!gameState.world) {
     return null;
   }
 
   const { width, height } = getViewportSize();
+  const { top: topInset, bottom: bottomInset } = getViewportInsets();
   const padding = Math.min(width, height) < 640 ? 18 : 28;
-  const availableWidth = width - padding * 2;
-  const availableHeight = height - padding * 2;
-  const cellSize = Math.max(18, Math.floor(Math.min(availableWidth / gameState.world.size, availableHeight / gameState.world.size)));
+  const boardFrameAllowance = BOARD_FRAME_INSET * 2;
+  const availableWidth = Math.max(width - padding * 2 - boardFrameAllowance, 1);
+  const availableHeight = Math.max(height - topInset - bottomInset - padding * 2 - boardFrameAllowance, 1);
+  const cellSize = Math.max(Math.floor(Math.min(availableWidth / gameState.world.size, availableHeight / gameState.world.size)), 1);
   const boardSize = cellSize * gameState.world.size;
 
   return {
     cellSize,
     boardSize,
     left: (width - boardSize) / 2,
-    top: (height - boardSize) / 2,
+    top: topInset + (height - topInset - bottomInset - boardSize) / 2,
     wallThickness: Math.max(2, Math.floor(cellSize * 0.12)),
   };
 }
@@ -198,7 +255,7 @@ function drawBoard() {
   const { cellSize, left, top, boardSize, wallThickness } = metrics;
   const radius = Math.max(12, cellSize * 0.22);
 
-  drawRoundedRect(left - 10, top - 10, boardSize + 20, boardSize + 20, radius + 6);
+  drawRoundedRect(left - BOARD_FRAME_INSET, top - BOARD_FRAME_INSET, boardSize + BOARD_FRAME_INSET * 2, boardSize + BOARD_FRAME_INSET * 2, radius + 6);
   ctx.fillStyle = "rgba(4, 17, 45, 0.86)";
   ctx.fill();
   ctx.strokeStyle = "rgba(103, 232, 249, 0.25)";
@@ -363,5 +420,5 @@ ui.bindEvents({
 resizeCanvas();
 setDifficulty("easy");
 returnToMenu();
-window.addEventListener("resize", resizeCanvas);
+bindResizeListeners();
 window.requestAnimationFrame(gameLoop);

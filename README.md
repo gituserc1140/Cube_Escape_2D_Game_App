@@ -1,5 +1,7 @@
 # Cube Escape 2D
 
+[![Launch Game](https://img.shields.io/badge/Launch-Game-22c55e?style=for-the-badge)](https://gituserc1140.github.io/Cube_Escape_2D_Game_App/)
+
 Cube Escape 2D is a mobile-friendly top-down maze game built with HTML, CSS, and JavaScript. Each run generates a fresh neon maze where you must collect three glowing keys, avoid time-draining traps, unlock the exit, and escape before the countdown reaches zero.
 
 ## Game Overview
@@ -59,6 +61,8 @@ README.md
 ```
 
 ## GitHub Pages Deployment
+
+If the repository sidebar does not show a Pages shortcut, use the **Launch Game** button above to open the deployed site directly.
 
 1. Push the repository to GitHub.
 2. Open **Settings → Pages** for the repository.
