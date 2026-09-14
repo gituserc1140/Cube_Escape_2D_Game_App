@@ -15,6 +15,7 @@ export class InputController {
     this.lookDelta = { x: 0, y: 0 };
     this.joystickVector = { x: 0, y: 0 };
     this.lookPointerId = null;
+    this.mouseLookPointerId = null;
     this.joystickPointerId = null;
     this.lastLookPoint = null;
     this.joystickStart = null;
@@ -55,6 +56,7 @@ export class InputController {
         return;
       }
 
+      this.mouseLookPointerId = event.pointerId;
       this.lookPointerId = event.pointerId;
       this.lastLookPoint = { x: event.clientX, y: event.clientY };
       this.canvas.setPointerCapture(event.pointerId);
@@ -74,6 +76,10 @@ export class InputController {
       if (event.pointerId === this.lookPointerId) {
         this.lookPointerId = null;
         this.lastLookPoint = null;
+      }
+
+      if (event.pointerId === this.mouseLookPointerId) {
+        this.mouseLookPointerId = null;
       }
     };
 
@@ -171,6 +177,7 @@ export class InputController {
   resetTouchInput() {
     this.joystickVector = { x: 0, y: 0 };
     this.lookPointerId = null;
+    this.mouseLookPointerId = null;
     this.joystickPointerId = null;
     this.lastLookPoint = null;
     this.joystickStart = null;
@@ -184,6 +191,9 @@ export class InputController {
       this.keys.clear();
       this.resetTouchInput();
       this.lookDelta = { x: 0, y: 0 };
+      this.mouseLookPointerId = null;
+      this.lookPointerId = null;
+      this.lastLookPoint = null;
     }
   }
 

@@ -221,17 +221,7 @@ function gameLoop() {
 
   if (gameState.playing && gameState.world) {
     const inputState = input.consumeFrameState();
-    const collisionBoxes = gameState.exitUnlocked
-      ? gameState.world.collisionBoxes
-      : [
-          ...gameState.world.collisionBoxes,
-          {
-            minX: gameState.world.door.mesh.position.x - MAZE_CONFIG.wallThickness / 2,
-            maxX: gameState.world.door.mesh.position.x + MAZE_CONFIG.wallThickness / 2,
-            minZ: gameState.world.door.mesh.position.z - (MAZE_CONFIG.cellSize * 0.65) / 2,
-            maxZ: gameState.world.door.mesh.position.z + (MAZE_CONFIG.cellSize * 0.65) / 2,
-          },
-        ];
+    const collisionBoxes = gameState.exitUnlocked ? gameState.world.collisionBoxes : gameState.world.lockedCollisionBoxes;
 
     player.update(deltaTime, inputState, collisionBoxes);
     animateWorld(deltaTime);

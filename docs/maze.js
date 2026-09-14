@@ -284,6 +284,12 @@ export function buildMazeWorld(scene, difficultyKey) {
   door.castShadow = true;
   door.receiveShadow = true;
   worldGroup.add(door);
+  const doorCollisionBox = {
+    minX: door.position.x - wallThickness / 2,
+    maxX: door.position.x + wallThickness / 2,
+    minZ: door.position.z - (cellSize * 0.65) / 2,
+    maxZ: door.position.z + (cellSize * 0.65) / 2,
+  };
 
   return {
     difficultyKey,
@@ -292,12 +298,14 @@ export function buildMazeWorld(scene, difficultyKey) {
     size,
     group: worldGroup,
     collisionBoxes,
+    lockedCollisionBoxes: [...collisionBoxes, doorCollisionBox],
     playerStart: new THREE.Vector3(-halfMaze + cellSize / 2, MAZE_CONFIG.playerEyeHeight, -halfMaze + cellSize / 2),
     boundsRadius: halfMaze - 0.3,
     keys,
     traps,
     door: {
       mesh: door,
+      collisionBox: doorCollisionBox,
       lockedColor: new THREE.Color(0x1e3a5f),
       lockedEmissive: new THREE.Color(0x082f49),
       unlockedColor: new THREE.Color(0x22c55e),
