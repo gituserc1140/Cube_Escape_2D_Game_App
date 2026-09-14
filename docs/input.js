@@ -40,10 +40,6 @@ export class InputController {
     });
 
     window.addEventListener("keyup", (event) => {
-      if (!this.active) {
-        return;
-      }
-
       this.keys.delete(event.code);
     });
 

@@ -114,12 +114,12 @@ function createWallBox(x, z, width, depth) {
 }
 
 // Assemble a simple stylized key from reusable primitive meshes.
-function buildKeyMesh(material) {
+function buildKeyMesh(geometries, material) {
   const keyGroup = new THREE.Group();
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.12, 12, 24), material);
-  const stem = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.12, 0.12), material);
-  const toothA = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.34, 0.12), material);
-  const toothB = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.22, 0.12), material);
+  const ring = new THREE.Mesh(geometries.ring, material);
+  const stem = new THREE.Mesh(geometries.stem, material);
+  const toothA = new THREE.Mesh(geometries.toothA, material);
+  const toothB = new THREE.Mesh(geometries.toothB, material);
 
   ring.rotation.y = Math.PI / 2;
   stem.position.set(0.62, 0, 0);
@@ -186,6 +186,12 @@ export function buildMazeWorld(scene, difficultyKey) {
   const floorGeometry = new THREE.PlaneGeometry(size * cellSize, size * cellSize);
   const trapGeometry = new THREE.BoxGeometry(cellSize * 0.5, 0.25, cellSize * 0.5);
   const doorGeometry = new THREE.BoxGeometry(wallThickness, wallHeight * 0.82, cellSize * 0.65);
+  const keyGeometries = {
+    ring: new THREE.TorusGeometry(0.34, 0.12, 12, 24),
+    stem: new THREE.BoxGeometry(0.85, 0.12, 0.12),
+    toothA: new THREE.BoxGeometry(0.14, 0.34, 0.12),
+    toothB: new THREE.BoxGeometry(0.14, 0.22, 0.12),
+  };
 
   const floor = new THREE.Mesh(floorGeometry, floorMaterial);
   floor.rotation.x = -Math.PI / 2;
@@ -237,16 +243,9 @@ export function buildMazeWorld(scene, difficultyKey) {
     }
   }
 
-  const keyTemplate = buildKeyMesh(keyMaterial);
-  const keyResources = [];
-  keyTemplate.traverse((child) => {
-    if (child.isMesh) {
-      keyResources.push(child.geometry);
-    }
-  });
   const keys = keyCells.map((cell, index) => {
     const worldPosition = cellToWorld(cell.x, cell.y, size);
-    const mesh = keyTemplate.clone(true);
+    const mesh = buildKeyMesh(keyGeometries, keyMaterial);
     mesh.position.set(worldPosition.x, 1.35, worldPosition.z);
     mesh.castShadow = true;
     mesh.userData.baseY = 1.35;
@@ -316,7 +315,7 @@ export function buildMazeWorld(scene, difficultyKey) {
       floorGeometry,
       trapGeometry,
       doorGeometry,
-      ...keyResources,
+      ...Object.values(keyGeometries),
     ],
   };
 }
