@@ -36,6 +36,7 @@ const gameState = {
   lastFrameTime: performance.now(),
   dpr: 1,
 };
+let resizeListenersBound = false;
 
 function getViewportSize() {
   const viewport = window.visualViewport;
@@ -161,6 +162,16 @@ function resizeCanvas() {
   canvas.height = Math.floor(height * gameState.dpr);
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
+}
+
+function bindResizeListeners() {
+  if (resizeListenersBound) {
+    return;
+  }
+
+  window.addEventListener("resize", resizeCanvas);
+  window.visualViewport?.addEventListener("resize", resizeCanvas);
+  resizeListenersBound = true;
 }
 
 function getBoardMetrics() {
@@ -396,6 +407,5 @@ ui.bindEvents({
 resizeCanvas();
 setDifficulty("easy");
 returnToMenu();
-window.addEventListener("resize", resizeCanvas);
-window.visualViewport?.addEventListener("resize", resizeCanvas);
+bindResizeListeners();
 window.requestAnimationFrame(gameLoop);
