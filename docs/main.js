@@ -104,6 +104,8 @@ function startGame() {
 function returnToMenu() {
   gameState.playing = false;
   input.setActive(false);
+  disposeWorld(scene, gameState.world);
+  gameState.world = null;
   ui.showTitle();
 }
 
@@ -267,7 +269,6 @@ ui.bindEvents({
 });
 
 setDifficulty("easy");
-createWorld();
 returnToMenu();
 window.addEventListener("resize", resizeRenderer);
 renderer.setAnimationLoop(gameLoop);
