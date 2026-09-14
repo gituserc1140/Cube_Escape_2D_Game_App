@@ -68,6 +68,7 @@ function carveMaze(size) {
     stack.push(neighbor);
   }
 
+  grid[size - 1][size - 1].walls.E = false;
   return grid;
 }
 

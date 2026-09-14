@@ -49,9 +49,12 @@ docs/
   style.css
   main.js
   maze.js
+  gameplay.js
   player.js
   ui.js
   input.js
+tests/
+  gameplay.test.mjs
 README.md
 ```
 

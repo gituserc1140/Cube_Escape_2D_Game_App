@@ -1,6 +1,7 @@
-import { buildMazeWorld, DIFFICULTIES, MAZE_CONFIG } from "./maze.js";
+import { buildMazeWorld, DIFFICULTIES } from "./maze.js";
 import { Player } from "./player.js";
 import { InputController } from "./input.js";
+import { evaluateInteractions } from "./gameplay.js";
 import { GameUI } from "./ui.js";
 
 const sceneContainer = document.getElementById("sceneContainer");
@@ -95,53 +96,30 @@ function endGame(victory) {
   ui.showEndScreen(victory);
 }
 
-function collectKey(key) {
-  key.collected = true;
-  gameState.keysCollected += 1;
-  updateStatusHUD();
-
-  if (gameState.keysCollected >= MAZE_CONFIG.keyCount) {
-    gameState.exitUnlocked = true;
-    ui.showStatus("Exit Open", true);
-  }
-}
-
-function triggerTrap(trap) {
-  trap.lastTriggeredAt = gameState.elapsed;
-  gameState.timer = Math.max(0, gameState.timer - 10);
-  updateStatusHUD();
-  ui.flashTrap();
-  ui.showStatus("-10 Seconds");
-}
-
-function isSameCell(a, b) {
-  return a.x === b.x && a.y === b.y;
-}
-
 function checkInteractions() {
   if (!gameState.world) {
     return;
   }
 
-  gameState.world.keys.forEach((key) => {
-    if (!key.collected && isSameCell(key.cell, player.position)) {
-      collectKey(key);
-    }
-  });
+  const interactionResult = evaluateInteractions(gameState, gameState.world, player.position);
 
-  gameState.world.traps.forEach((trap) => {
-    if (isSameCell(trap.cell, player.position) && gameState.elapsed - trap.lastTriggeredAt > 0.6) {
-      triggerTrap(trap);
-    }
-  });
+  if (interactionResult.collectedKey || interactionResult.triggeredTrap) {
+    updateStatusHUD();
+  }
 
-  if (isSameCell(gameState.world.exitCell, player.position)) {
-    if (gameState.exitUnlocked) {
-      endGame(true);
-    } else if (gameState.elapsed >= gameState.hintCooldown) {
-      gameState.hintCooldown = gameState.elapsed + 1.2;
-      ui.showStatus("Collect all keys");
-    }
+  if (interactionResult.unlockedExit) {
+    ui.showStatus("Exit Open", true);
+  }
+
+  if (interactionResult.triggeredTrap) {
+    ui.flashTrap();
+    ui.showStatus("-10 Seconds");
+  }
+
+  if (interactionResult.reachedExit) {
+    endGame(true);
+  } else if (interactionResult.needsExitHint) {
+    ui.showStatus("Collect all keys");
   }
 }
 
@@ -337,6 +315,8 @@ function drawBoard() {
 }
 
 function render() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.setTransform(gameState.dpr, 0, 0, gameState.dpr, 0, 0);
   drawBackground();
 
