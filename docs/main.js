@@ -198,7 +198,7 @@ function getBoardMetrics() {
   const boardFrameAllowance = BOARD_FRAME_INSET * 2;
   const availableWidth = Math.max(width - padding * 2 - boardFrameAllowance, 1);
   const availableHeight = Math.max(height - topInset - bottomInset - padding * 2 - boardFrameAllowance, 1);
-  const cellSize = Math.max(8, Math.floor(Math.min(availableWidth / gameState.world.size, availableHeight / gameState.world.size)));
+  const cellSize = Math.max(Math.floor(Math.min(availableWidth / gameState.world.size, availableHeight / gameState.world.size)), 1);
   const boardSize = cellSize * gameState.world.size;
 
   return {
