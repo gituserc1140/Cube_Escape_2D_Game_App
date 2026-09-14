@@ -1,5 +1,6 @@
 import { DIFFICULTIES } from "./maze.js";
 
+// Handle menu flow, HUD updates, feedback banners, and end-screen presentation.
 export class GameUI {
   constructor() {
     this.elements = {
@@ -24,6 +25,7 @@ export class GameUI {
     };
 
     this.statusTimeout = null;
+    this.persistentStatus = "";
   }
 
   bindEvents(handlers) {
@@ -53,7 +55,7 @@ export class GameUI {
   }
 
   showTitle() {
-    this.hideStatus();
+    this.clearPersistentStatus();
     this.elements.hud.classList.add("hidden");
     this.elements.endScreen.classList.add("hidden");
     this.elements.instructionsScreen.classList.add("hidden");
@@ -87,6 +89,7 @@ export class GameUI {
   }
 
   showStatus(message, persistent = false) {
+    this.persistentStatus = persistent ? message : this.persistentStatus;
     this.elements.statusBanner.textContent = message;
     this.elements.statusBanner.classList.remove("hidden");
 
@@ -106,7 +109,18 @@ export class GameUI {
       this.statusTimeout = null;
     }
 
+    if (this.persistentStatus) {
+      this.elements.statusBanner.textContent = this.persistentStatus;
+      this.elements.statusBanner.classList.remove("hidden");
+      return;
+    }
+
     this.elements.statusBanner.classList.add("hidden");
+  }
+
+  clearPersistentStatus() {
+    this.persistentStatus = "";
+    this.hideStatus();
   }
 
   flashTrap() {

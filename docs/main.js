@@ -45,6 +45,7 @@ const input = new InputController({
 const player = new Player(camera);
 const clock = new THREE.Clock();
 
+// Track the current run so the render loop can coordinate gameplay and UI state.
 const gameState = {
   difficultyKey: "easy",
   world: null,
@@ -56,6 +57,7 @@ const gameState = {
   hintCooldown: 0,
 };
 
+// Keep the HUD in sync with the active timer, key count, and selected difficulty.
 function updateStatusHUD() {
   ui.updateHUD({
     timeRemaining: gameState.timer,
@@ -64,12 +66,18 @@ function updateStatusHUD() {
   });
 }
 
+function distanceXZ(a, b) {
+  return Math.hypot(a.x - b.x, a.z - b.z);
+}
+
+// Difficulty changes affect both the menu highlight and the next generated maze.
 function setDifficulty(difficultyKey) {
   gameState.difficultyKey = DIFFICULTIES[difficultyKey] ? difficultyKey : "easy";
   ui.setDifficulty(gameState.difficultyKey);
   updateStatusHUD();
 }
 
+// Rebuild the whole maze world whenever a new game starts.
 function createWorld() {
   disposeWorld(scene, gameState.world);
   gameState.world = buildMazeWorld(scene, gameState.difficultyKey);
@@ -77,6 +85,7 @@ function createWorld() {
   player.reset(gameState.world.playerStart);
 }
 
+// Reset the run state and drop the player into a newly generated maze.
 function startGame() {
   createWorld();
   gameState.playing = true;
@@ -85,6 +94,7 @@ function startGame() {
   gameState.exitUnlocked = false;
   gameState.elapsed = 0;
   gameState.hintCooldown = 0;
+  ui.clearPersistentStatus();
   updateDoorState();
   updateStatusHUD();
   ui.showGame();
@@ -107,6 +117,7 @@ function hideInstructions() {
 function endGame(victory) {
   gameState.playing = false;
   input.resetTouchInput();
+  ui.clearPersistentStatus();
   ui.showEndScreen(victory);
 }
 
@@ -124,6 +135,7 @@ function updateDoorState() {
   );
 }
 
+// Item collection, trap penalties, and the exit door are checked every frame.
 function collectKey(key) {
   key.collected = true;
   key.mesh.visible = false;
@@ -155,20 +167,20 @@ function checkInteractions() {
       return;
     }
 
-    const distance = key.mesh.position.distanceTo(player.position);
+    const distance = distanceXZ(key.mesh.position, player.position);
     if (distance <= key.radius) {
       collectKey(key);
     }
   });
 
   gameState.world.traps.forEach((trap) => {
-    const distance = trap.mesh.position.distanceTo(player.position);
+    const distance = distanceXZ(trap.mesh.position, player.position);
     if (distance <= trap.size && gameState.elapsed - trap.lastTriggeredAt > 1.2) {
       triggerTrap(trap);
     }
   });
 
-  const doorDistance = gameState.world.door.mesh.position.distanceTo(player.position);
+  const doorDistance = distanceXZ(gameState.world.door.mesh.position, player.position);
   if (doorDistance <= gameState.world.door.triggerRadius) {
     if (gameState.exitUnlocked) {
       endGame(true);

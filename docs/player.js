@@ -8,6 +8,7 @@ function circleIntersectsBox(x, z, radius, box) {
   return distanceX * distanceX + distanceZ * distanceZ < radius * radius;
 }
 
+// Manage first-person movement, camera rotation, and simple maze collision checks.
 export class Player {
   constructor(camera) {
     this.camera = camera;

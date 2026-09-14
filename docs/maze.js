@@ -21,6 +21,7 @@ const DIRECTIONS = [
   { key: "W", dx: -1, dy: 0, opposite: "E" },
 ];
 
+// Randomize traversal order so each recursive carve creates a fresh maze layout.
 function shuffle(items) {
   for (let index = items.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(Math.random() * (index + 1));
@@ -30,6 +31,7 @@ function shuffle(items) {
   return items;
 }
 
+// Convert logical maze cells into centered world positions for Three.js meshes.
 function cellToWorld(x, y, size) {
   const offset = (size * MAZE_CONFIG.cellSize) / 2;
 
@@ -39,6 +41,7 @@ function cellToWorld(x, y, size) {
   };
 }
 
+// Build a grid where each cell starts fully enclosed by walls.
 function createGrid(size) {
   return Array.from({ length: size }, (_, y) =>
     Array.from({ length: size }, (_, x) => ({
@@ -50,6 +53,7 @@ function createGrid(size) {
   );
 }
 
+// Carve a perfect maze with a depth-first search and leave a single exit opening.
 function carveMaze(size) {
   const grid = createGrid(size);
   const stack = [grid[0][0]];
@@ -83,6 +87,7 @@ function carveMaze(size) {
   return grid;
 }
 
+// Pick random empty cells for gameplay items while avoiding reserved spots.
 function chooseCells(size, count, blockedSet) {
   const cells = [];
 
@@ -108,6 +113,7 @@ function createWallBox(x, z, width, depth) {
   };
 }
 
+// Assemble a simple stylized key from reusable primitive meshes.
 function buildKeyMesh(material) {
   const keyGroup = new THREE.Group();
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.12, 12, 24), material);
@@ -124,6 +130,7 @@ function buildKeyMesh(material) {
   return keyGroup;
 }
 
+// Create the playable maze, including geometry, collision data, keys, traps, and exit door.
 export function buildMazeWorld(scene, difficultyKey) {
   const settings = DIFFICULTIES[difficultyKey] ?? DIFFICULTIES.easy;
   const size = settings.size;
@@ -231,6 +238,12 @@ export function buildMazeWorld(scene, difficultyKey) {
   }
 
   const keyTemplate = buildKeyMesh(keyMaterial);
+  const keyResources = [];
+  keyTemplate.traverse((child) => {
+    if (child.isMesh) {
+      keyResources.push(child.geometry);
+    }
+  });
   const keys = keyCells.map((cell, index) => {
     const worldPosition = cellToWorld(cell.x, cell.y, size);
     const mesh = keyTemplate.clone(true);
@@ -292,10 +305,23 @@ export function buildMazeWorld(scene, difficultyKey) {
       unlockedEmissive: new THREE.Color(0x166534),
       triggerRadius: 1.7,
     },
-    resources: [wallMaterial, floorMaterial, trapMaterial, keyMaterial, doorMaterial, wallBoxGeometry, sideWallGeometry, floorGeometry, trapGeometry, doorGeometry],
+    resources: [
+      wallMaterial,
+      floorMaterial,
+      trapMaterial,
+      keyMaterial,
+      doorMaterial,
+      wallBoxGeometry,
+      sideWallGeometry,
+      floorGeometry,
+      trapGeometry,
+      doorGeometry,
+      ...keyResources,
+    ],
   };
 }
 
+// Tear down the previous world before generating a new run.
 export function disposeWorld(scene, world) {
   if (!world) {
     return;

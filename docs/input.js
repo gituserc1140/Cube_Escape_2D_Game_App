@@ -2,6 +2,7 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+// Unify keyboard, mouse drag, joystick, and touch-look input into one frame state.
 export class InputController {
   constructor({ canvas, joystickZone, joystickBase, joystickKnob, lookPad }) {
     this.canvas = canvas;
