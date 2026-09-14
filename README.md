@@ -10,7 +10,7 @@ Cube Escape 3D is a mobile-friendly first-person maze game built with HTML, CSS,
 - Trap tiles that remove 10 seconds on contact
 - Difficulty modes with different maze sizes and timers
 - Responsive HUD, menus, and end screens
-- GitHub Pages-ready deployment from the `/docs` folder
+- GitHub Pages-ready deployment from the `/docs` folder with all runtime assets stored in-repo
 
 ## Controls
 
@@ -76,4 +76,5 @@ README.md
 ## Notes
 
 - The root `index.html` redirects to `/docs/` for convenience.
+- Three.js is vendored in `docs/vendor/three.module.js` so the published site does not depend on a third-party CDN at runtime.
 - The game runs entirely client-side with no backend services.

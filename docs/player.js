@@ -1,4 +1,4 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js";
+import * as THREE from "./vendor/three.module.js";
 
 function circleIntersectsBox(x, z, radius, box) {
   const nearestX = Math.max(box.minX, Math.min(x, box.maxX));
