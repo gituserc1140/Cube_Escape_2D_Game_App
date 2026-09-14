@@ -1,0 +1,335 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, Arial, sans-serif;
+  --bg: #020a1d;
+  --panel: rgba(4, 17, 45, 0.8);
+  --panel-border: rgba(103, 232, 249, 0.25);
+  --text: #eff6ff;
+  --muted: #bfdbfe;
+  --cyan: #67e8f9;
+  --cyan-strong: #22d3ee;
+  --yellow: #fde047;
+  --green: #22c55e;
+  --red: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at top, #0b214e 0%, var(--bg) 58%);
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+#app,
+#sceneContainer,
+#sceneContainer canvas {
+  width: 100vw;
+  height: 100vh;
+}
+
+#app {
+  position: relative;
+  overflow: hidden;
+}
+
+#sceneContainer {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+}
+
+.panel {
+  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.12);
+}
+
+#hud {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 999px;
+  width: min(92vw, 700px);
+  justify-content: space-between;
+}
+
+.hud-item {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+  text-align: center;
+}
+
+.hud-label,
+.block-label,
+.control-label,
+.eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+#statusBanner {
+  position: absolute;
+  top: calc(max(1rem, env(safe-area-inset-top)) + 5.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  max-width: min(88vw, 340px);
+  text-align: center;
+}
+
+#flashOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: rgba(239, 68, 68, 0.32);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease;
+}
+
+#flashOverlay.active {
+  opacity: 1;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.5);
+}
+
+.menu-card,
+.modal-card {
+  width: min(92vw, 760px);
+  border-radius: 24px;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.menu-card {
+  display: grid;
+  gap: 1.2rem;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2.6rem, 7vw, 4.6rem);
+  line-height: 0.95;
+}
+
+h2 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  margin-bottom: 1rem;
+}
+
+h3 {
+  margin-bottom: 0.65rem;
+  color: var(--cyan);
+}
+
+.intro {
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 42rem;
+}
+
+.difficulty-block {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.difficulty-buttons,
+.menu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.difficulty-button,
+.primary-button,
+.secondary-button {
+  border-radius: 999px;
+  border: 1px solid rgba(103, 232, 249, 0.28);
+  padding: 0.9rem 1.25rem;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.difficulty-button,
+.secondary-button {
+  background: rgba(8, 30, 69, 0.82);
+}
+
+.primary-button {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.9), rgba(8, 145, 178, 0.92));
+  color: #03202c;
+  font-weight: 700;
+}
+
+.difficulty-button.active {
+  border-color: rgba(253, 224, 71, 0.9);
+  background: rgba(59, 39, 0, 0.65);
+  color: var(--yellow);
+}
+
+.difficulty-button:hover,
+.primary-button:hover,
+.secondary-button:hover,
+.difficulty-button:focus-visible,
+.primary-button:focus-visible,
+.secondary-button:focus-visible {
+  transform: translateY(-1px);
+  outline: none;
+  border-color: rgba(103, 232, 249, 0.8);
+}
+
+.instructions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.instructions-grid ul {
+  margin: 0;
+  padding-left: 1rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+#touchControls {
+  position: absolute;
+  inset: auto 0 max(1rem, env(safe-area-inset-bottom)) 0;
+  z-index: 6;
+  display: none;
+  justify-content: space-between;
+  align-items: end;
+  padding: 0 1rem;
+  pointer-events: none;
+}
+
+.control-surface {
+  width: min(42vw, 180px);
+  height: min(42vw, 180px);
+  border-radius: 24px;
+  border: 1px solid rgba(103, 232, 249, 0.22);
+  background: rgba(3, 15, 40, 0.38);
+  position: relative;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.control-surface .control-label {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+}
+
+#joystickBase {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 110px;
+  height: 110px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(103, 232, 249, 0.25);
+  background: rgba(7, 25, 61, 0.55);
+}
+
+#joystickKnob {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 52px;
+  height: 52px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #a5f3fc 0%, #22d3ee 42%, #0f4c81 100%);
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.35);
+}
+
+#lookPad::after {
+  content: "";
+  position: absolute;
+  inset: 1rem;
+  border: 1px dashed rgba(103, 232, 249, 0.3);
+  border-radius: 18px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (pointer: coarse), (max-width: 900px) {
+  #touchControls {
+    display: flex;
+  }
+}
+
+@media (max-width: 900px) {
+  #hud {
+    width: min(94vw, 540px);
+    gap: 0.5rem;
+    padding: 0.8rem;
+  }
+
+  .instructions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .menu-card,
+  .modal-card {
+    border-radius: 20px;
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 12vw, 3.6rem);
+  }
+
+  #hud {
+    top: max(0.65rem, env(safe-area-inset-top));
+    border-radius: 24px;
+    flex-wrap: wrap;
+  }
+
+  .hud-item {
+    flex: 1 1 30%;
+  }
+
+  #statusBanner {
+    top: calc(max(0.65rem, env(safe-area-inset-top)) + 6.75rem);
+  }
+}

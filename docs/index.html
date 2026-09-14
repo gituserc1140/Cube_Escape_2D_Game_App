@@ -2,28 +2,115 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gaming Micro App</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Cube Escape 3D</title>
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <h1>Gaming Micro App Template</h1>
-      <p class="subtitle">Replace this starter content with your game UI.</p>
+    <div id="app">
+      <main id="sceneContainer" aria-label="Cube Escape 3D game view"></main>
 
-      <section class="play-area" aria-label="Game area">
-        <canvas id="gameCanvas" width="960" height="540"></canvas>
+      <header id="hud" class="panel hidden" aria-live="polite">
+        <div class="hud-item">
+          <span class="hud-label">Time</span>
+          <strong id="timeValue">180</strong>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Keys</span>
+          <strong id="keyValue">0 / 3</strong>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Difficulty</span>
+          <strong id="difficultyValue">Easy</strong>
+        </div>
+      </header>
+
+      <div id="statusBanner" class="panel hidden" aria-live="assertive"></div>
+      <div id="flashOverlay" aria-hidden="true"></div>
+
+      <section id="titleScreen" class="screen">
+        <div class="panel menu-card">
+          <p class="eyebrow">Minimal Neon Maze</p>
+          <h1>Cube Escape 3D</h1>
+          <p class="intro">
+            Explore a shifting neon maze, collect three glowing keys, dodge traps, and escape before the timer runs out.
+          </p>
+
+          <div class="difficulty-block">
+            <span class="block-label">Difficulty Select</span>
+            <div class="difficulty-buttons" role="group" aria-label="Choose a difficulty">
+              <button class="difficulty-button active" data-difficulty="easy" type="button">Easy</button>
+              <button class="difficulty-button" data-difficulty="medium" type="button">Medium</button>
+              <button class="difficulty-button" data-difficulty="hard" type="button">Hard</button>
+            </div>
+          </div>
+
+          <div class="menu-actions">
+            <button id="playButton" class="primary-button" type="button">Play</button>
+            <button id="instructionsButton" class="secondary-button" type="button">Instructions</button>
+          </div>
+        </div>
       </section>
 
-      <section class="notes">
-        <h2>Next steps</h2>
-        <ul>
-          <li>Build your game loop in <code>docs/game.js</code>.</li>
-          <li>Design your HUD/menu in this file.</li>
-          <li>Adjust styles in <code>docs/styles.css</code>.</li>
-        </ul>
+      <section id="instructionsScreen" class="screen hidden">
+        <div class="panel modal-card">
+          <h2>How To Escape</h2>
+          <div class="instructions-grid">
+            <div>
+              <h3>Desktop</h3>
+              <ul>
+                <li>W / S move forward and backward.</li>
+                <li>A / D strafe left and right.</li>
+                <li>Drag on the maze view to look around.</li>
+                <li>Arrow keys also turn the camera.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Mobile</h3>
+              <ul>
+                <li>Use the joystick to move.</li>
+                <li>Swipe on the look pad to turn.</li>
+                <li>Keep the exit in sight once it opens.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Objectives</h3>
+              <ul>
+                <li>Collect all three floating keys.</li>
+                <li>Avoid red traps or lose 10 seconds.</li>
+                <li>Touch the exit door before time reaches zero.</li>
+              </ul>
+            </div>
+          </div>
+          <button id="closeInstructionsButton" class="primary-button" type="button">Back</button>
+        </div>
       </section>
-    </main>
-    <script src="./game.js"></script>
+
+      <section id="endScreen" class="screen hidden">
+        <div class="panel modal-card">
+          <p class="eyebrow" id="endEyebrow">Maze Complete</p>
+          <h2 id="endTitle">You Escaped!</h2>
+          <p id="endMessage">The exit was yours to claim.</p>
+          <div class="menu-actions">
+            <button id="playAgainButton" class="primary-button" type="button">Play Again</button>
+            <button id="mainMenuButton" class="secondary-button" type="button">Main Menu</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="touchControls" aria-label="Touch controls for movement and camera look">
+        <div id="joystickZone" class="control-surface" aria-hidden="true">
+          <span class="control-label">Move</span>
+          <div id="joystickBase">
+            <div id="joystickKnob"></div>
+          </div>
+        </div>
+        <div id="lookPad" class="control-surface" aria-hidden="true">
+          <span class="control-label">Look</span>
+        </div>
+      </section>
+    </div>
+
+    <script type="module" src="./main.js"></script>
   </body>
 </html>
