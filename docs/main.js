@@ -22,6 +22,7 @@ const layoutElements = {
   statusBanner: document.getElementById("statusBanner"),
   touchControls: document.getElementById("touchControls"),
 };
+const BOARD_FRAME_INSET = 10;
 const player = new Player();
 
 const gameState = {
@@ -182,9 +183,9 @@ function getBoardMetrics() {
   const { width, height } = getViewportSize();
   const { top: topInset, bottom: bottomInset } = getViewportInsets();
   const padding = Math.min(width, height) < 640 ? 18 : 28;
-  const boardFrame = 20;
-  const availableWidth = Math.max(width - padding * 2 - boardFrame, 1);
-  const availableHeight = Math.max(height - topInset - bottomInset - padding * 2 - boardFrame, 1);
+  const boardFrameAllowance = BOARD_FRAME_INSET * 2;
+  const availableWidth = Math.max(width - padding * 2 - boardFrameAllowance, 1);
+  const availableHeight = Math.max(height - topInset - bottomInset - padding * 2 - boardFrameAllowance, 1);
   const cellSize = Math.max(8, Math.floor(Math.min(availableWidth / gameState.world.size, availableHeight / gameState.world.size)));
   const boardSize = cellSize * gameState.world.size;
 
@@ -242,7 +243,7 @@ function drawBoard() {
   const { cellSize, left, top, boardSize, wallThickness } = metrics;
   const radius = Math.max(12, cellSize * 0.22);
 
-  drawRoundedRect(left - 10, top - 10, boardSize + 20, boardSize + 20, radius + 6);
+  drawRoundedRect(left - BOARD_FRAME_INSET, top - BOARD_FRAME_INSET, boardSize + BOARD_FRAME_INSET * 2, boardSize + BOARD_FRAME_INSET * 2, radius + 6);
   ctx.fillStyle = "rgba(4, 17, 45, 0.86)";
   ctx.fill();
   ctx.strokeStyle = "rgba(103, 232, 249, 0.25)";
